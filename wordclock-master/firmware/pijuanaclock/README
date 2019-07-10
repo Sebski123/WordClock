@@ -1,0 +1,73 @@
+Pijuana wordclock
+=================
+
+This is the code for a modified version of Wordclock, made by Wouter Devinck in 2014:
+http://www.instructables.com/id/Wordclock/
+https://github.com/wouterdevinck/wordclock/
+
+Our version implements a Catalan language translation of the wordclock and adds many new features, making it an amazing and multifunctional wall clock.
+
+The hardware platform is almost identical to Wouter's project. The main difference is that we used a regular Arduino Nano and an external RTC module, instead of the custom PCB with power circuitry and Atmega328P, DS3231 chips from the original project.
+
+The name comes from a happily newly married couple, recipient of the clock as a present.
+
+July 2015 - September 2015
+ Aleix Mercader, Antonio Camacho, Cesar August Pomerol, Enric Masdeu,
+ Isabel Martínez, Jordi Aranda, Laura Mampel, Oriol Bernadó, Sergi Vaqué
+
+ 
+License
+-------
+ 
+This work is licensed under a Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International License
+http://creativecommons.org/licenses/by-nc-sa/4.0/
+ 
+ 
+Dependencies
+------------
+  * Arduino libraries                - http://arduino.cc/
+  * Chronodot library (for DS3231)   - https://github.com/Stephanie-Maks/Arduino-Chronodot
+  * LedControl library (for MAX7219) - http://playground.arduino.cc/Main/LedControl
+  * Temp. sensor library (for DHT22) - https://github.com/adafruit/DHT-sensor-library
+  * Simple Tetris Clone library      - https://github.com/ex/blocks
+
+  
+Modes
+-----
+
+  1.- Wordclock
+  2.- Digital Clock
+  3.- Temperature & Humidity
+  4.- Analog Clock
+  5.- Game of Life
+  6.- Simon Says Game
+  7.- Tetris Game
+  8.- Credits
+
+  
+Description of files
+--------------------
+
+  pijuanaclock.ino     Main program
+  brightness.cpp/.h    Brightness autoadjustment
+  character.cpp/.h     Character (digit) definitions
+  credits.cpp/.h       Ending Credits 
+  display.cpp/.h       Display & LED functions
+  life.cpp/.h          Game of Life 
+  serial.cpp/.h        Serial port setup menu
+  simon.cpp/.h         Simon Says game 
+  temphum.cpp/.h       Temperature & Humidity display
+  tetris.cpp/.h        Tetris game
+  time.cpp/.h          Wordclock, digital clock
+  timeanalog.cpp/.h    Analog clock 
+  touchbuttons.cpp/.h  Touch buttons, mode switching
+  
+  Third party libraries:
+    
+  Chronodot.cpp/.h       Chronodot library (for DS3231) 
+  DHT.cpp/.h             Temperature sensor library (for DHT22)
+  LedControl.cpp/.h      LedControl library (for MAX7219)
+  stc.cpp/.h/platform.h  Simple Tetris Clone library
+  pitches.h              Note frequencies from the Arduino webpage
+  
+  
