@@ -10,8 +10,8 @@
 #include "LedControl.h" // MAX7219 - LED matrix drivers - http://playground.arduino.cc/Main/LedControl
 
 // Pins to led drivers
-#define pinData  14  // A0 (used as digital pin)
-#define pinLoad  15  // A1 (used as digital pin)
+#define pinData  8  // A0 (used as digital pin)
+#define pinLoad  7  // A1 (used as digital pin)
 #define pinClock 16  // A2 (used as digital pin)
 
 

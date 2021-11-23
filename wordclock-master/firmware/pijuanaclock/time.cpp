@@ -8,9 +8,9 @@
 
 Chronodot RTC;
 
-#define UPDATE_RATE_SETTING_TIME 250 
+#define UPDATE_RATE_SETTING_TIME 250
 
-byte h, m;
+byte h, m, t, s;
 byte timeMode = TIME_MODE_NORMAL;
 
 boolean blink = true; // Used to blink the colon or the hour/minute
@@ -18,7 +18,7 @@ boolean blink = true; // Used to blink the colon or the hour/minute
 void timeManager(unsigned long now, boolean modeChanged)
 {
   static unsigned long prev;
- 
+
   if (timeMode == TIME_MODE_NORMAL) // Do not change mode when setting time
   {
     // Change global mode when top buttons pressed
@@ -32,11 +32,11 @@ void timeManager(unsigned long now, boolean modeChanged)
       goToNextMode();
       return;
     }
-    
+
     // Enter setting time mode when pressing both bottom buttons
     if ((BL_KEY_DOWN && BR_KEY_PRESSED ||
-         BR_KEY_DOWN && BL_KEY_PRESSED ) &&
-         displayMode == MODE_DIGITAL_CLOCK) // Allow to set time only in digital mode
+         BR_KEY_DOWN && BL_KEY_PRESSED) &&
+        displayMode == MODE_DIGITAL_CLOCK) // Allow to set time only in digital mode
     {
       timeMode = TIME_MODE_SETTING_HOUR;
       return;
@@ -52,12 +52,12 @@ void timeManager(unsigned long now, boolean modeChanged)
       return;
     }
   }
-  
+
   // Proceed only if just entered this mode or if interval has passed or if setting time
-  if (!modeChanged && now-prev < TIME_INTERVAL && timeMode == TIME_MODE_NORMAL)
+  if (!modeChanged && now - prev < TIME_INTERVAL && timeMode == TIME_MODE_NORMAL)
     return;
-   //prev = now; // done below
-  
+  //prev = now; // done below
+
   if (timeMode == TIME_MODE_NORMAL)
   {
     // Get the time from the RTC
@@ -85,45 +85,53 @@ void timeManager(unsigned long now, boolean modeChanged)
       {
         updateRTCtime();
         timeMode = TIME_MODE_NORMAL;
-      }  
+      }
     }
     else if (TL_KEY_DOWN) // Top left button pressed
     {
-       // Decrement hour or minute
-       if (timeMode == TIME_MODE_SETTING_HOUR)
-       {  
-          if (h == 0) h = 23;
-          else h--;
-       }
-       else //timeMode == TIME_MODE_SETTING_MINUTE
-       {
-          if (m == 0) m = 59;
-          else m--;
-       }
-       blink = true;
+      // Decrement hour or minute
+      if (timeMode == TIME_MODE_SETTING_HOUR)
+      {
+        if (h == 0)
+          h = 23;
+        else
+          h--;
+      }
+      else //timeMode == TIME_MODE_SETTING_MINUTE
+      {
+        if (m == 0)
+          m = 59;
+        else
+          m--;
+      }
+      blink = true;
     }
-    else if (TR_KEY_DOWN)  // Top right button pressed
+    else if (TR_KEY_DOWN) // Top right button pressed
     {
-       // Increment hour or minute
-       if (timeMode == TIME_MODE_SETTING_HOUR)
-       {  
-          if (h == 23) h = 0;
-          else h++;
-          }
-       else //timeMode == TIME_MODE_SETTING_MINUTE
-       {
-          if (m == 59) m = 0;
-          else m++;
-       }
-       blink = true;
+      // Increment hour or minute
+      if (timeMode == TIME_MODE_SETTING_HOUR)
+      {
+        if (h == 23)
+          h = 0;
+        else
+          h++;
+      }
+      else //timeMode == TIME_MODE_SETTING_MINUTE
+      {
+        if (m == 59)
+          m = 0;
+        else
+          m++;
+      }
+      blink = true;
     }
   }
-   
+
   // Show the time on the display
-  if (now-prev < UPDATE_RATE_SETTING_TIME && timeMode != TIME_MODE_NORMAL) // Hack to avoid seizure-inducing blinking when setting time
+  if (now - prev < UPDATE_RATE_SETTING_TIME && timeMode != TIME_MODE_NORMAL) // Hack to avoid seizure-inducing blinking when setting time
     return;
   prev = now;
-  showTime();  
+  showTime();
 }
 
 void initRTC()
@@ -133,7 +141,7 @@ void initRTC()
   if (!RTC.isrunning())
   {
     //Serial.println(F("[WARNING] RTC is NOT running!"));
-    //RTC.adjust(DateTime(__DATE__, __TIME__));
+    RTC.adjust(DateTime(__DATE__, __TIME__));
     //RTC.adjust(DateTime("Sep 12 2015", "17:00:00"));
     //RTC.adjust(DateTime(0l));
   }
@@ -142,44 +150,41 @@ void initRTC()
 // Fill h and m variables with the current time from the RTC
 void getRTCtime()
 {
-    DateTime now = RTC.now();  
-    h = now.hour();
-    m = now.minute();
-    t = now.tempC();
+  DateTime now = RTC.now();
+  h = now.hour();
+  m = now.minute();
+  t = now.tempC();
+  s = now.second();
 }
-
 
 // Update time in the RTC using h and m variables
 void updateRTCtime()
 {
-    DateTime newDateTime = DateTime(
+  DateTime newDateTime = DateTime(
       2015, 9, 12,
       h, m,
       0, 32, 0.0);
-    RTC.adjust(newDateTime); 
+  RTC.adjust(newDateTime);
 }
-
 
 // Show the time with the currently selected clock mode
 void showTime()
 {
   clearFrame();
-  
+
   switch (displayMode)
   {
-    case MODE_WORD_CLOCK:
-      showTimeWords();
-      break;
-    case MODE_DIGITAL_CLOCK:
-      showTimeDigits();
-      break;
-    case MODE_ANALOG_CLOCK:
-      showTimeAnalog();
-      break;
+  case MODE_WORD_CLOCK:
+    showTimeWords();
+    break;
+  case MODE_DIGITAL_CLOCK:
+    showTimeDigits();
+    break;
+  case MODE_ANALOG_CLOCK:
+    showTimeAnalog();
+    break;
   }
 }
-
-
 
 // Show the current time on the display using digits
 void showTimeDigits()
@@ -189,36 +194,34 @@ void showTimeDigits()
   byte hSingles = h % 10;
   byte mTens = m / 10;
   byte mSingles = m % 10;
-  
+
   // Print the hour (blink if setting hour)
   if (timeMode == TIME_MODE_NORMAL ||
-      timeMode == TIME_MODE_SETTING_HOUR && blink || 
+      timeMode == TIME_MODE_SETTING_HOUR && blink ||
       timeMode == TIME_MODE_SETTING_MINUTE)
   {
-    addCharToFrame(0           ,0            , hTens);
-    addCharToFrame(CHAR_WIDTH+1,0            , hSingles);
+    addCharToFrame(0, 0, hTens);
+    addCharToFrame(CHAR_WIDTH + 1, 0, hSingles);
   }
-  
+
   // Print the minute (blink if setting minute)
   if (timeMode == TIME_MODE_NORMAL ||
       timeMode == TIME_MODE_SETTING_HOUR ||
       timeMode == TIME_MODE_SETTING_MINUTE && blink)
   {
-    addCharToFrame(0           ,CHAR_HEIGHT+1, mTens);
-    addCharToFrame(CHAR_WIDTH+1,CHAR_HEIGHT+1, mSingles);
+    addCharToFrame(0, CHAR_HEIGHT + 1, mTens);
+    addCharToFrame(CHAR_WIDTH + 1, CHAR_HEIGHT + 1, mSingles);
   }
-  
+
   // Draw blinking colon
   //frame[2][13] = blink;
-  //frame[4][13] = blink;  
-  setFrame(frame2,2,13,blink);
-  setFrame(frame2,4,13,blink);
+  //frame[4][13] = blink;
+  setFrame(frame2, 2, 13, blink);
+  setFrame(frame2, 4, 13, blink);
   blink = !blink;
 
   updateDisplay();
 }
-
-
 
 // Show the current time on the display using words
 void showTimeWords()
@@ -228,92 +231,147 @@ void showTimeWords()
   // Show "IT IS"
   addWordToFrame(w_it);
   addWordToFrame(w_is);
-  
+
   // Minutes
-  if (m == 0) {
-    
-    if (h == 0) {
+  if (m == 0)
+  {
+
+    if (h == 0)
+    {
       addWordToFrame(w_midnight);
-    } else if (h == 12) {
+    }
+    else if (h == 12)
+    {
       addWordToFrame(w_noon);
-    } else {
+    }
+    else
+    {
       addWordToFrame(w_oclock);
     }
+  }
+  else
+  {
 
-  } else {
-  
-    if (m <= 20) {
+    if (m <= 20)
+    {
       addWordToFrame(w_minutes[m - 1]);
-    } else if (m < 30) {
+    }
+    else if (m < 30)
+    {
       addWordToFrame(w_minutes[19]); // twenty
       addWordToFrame(w_minutes[m - 21]);
-    } else if (m == 30) {
+    }
+    else if (m == 30)
+    {
       addWordToFrame(w_half);
-    } else if (m < 40) {
+    }
+    else if (m < 40)
+    {
       addWordToFrame(w_minutes[19]); // twenty
       addWordToFrame(w_minutes[60 - m - 21]);
-    } else {
+    }
+    else
+    {
       addWordToFrame(w_minutes[60 - m - 1]);
     }
- 
-    if(m <= 30) {
+
+    if (m <= 30)
+    {
       addWordToFrame(w_past);
-    } else {
+    }
+    else
+    {
       addWordToFrame(w_to);
       ++h2;
     }
-    
-  } 
-  
-  if(!(m ==0 && (h == 0 || h == 12))) {
-  
+  }
+
+  if (!(m == 0 && (h == 0 || h == 12)))
+  {
+
     // Hours
-    if(h2 == 0) {
+    if (h2 == 0)
+    {
       addWordToFrame(w_hours[11]);
-    } else if (h2 <= 12) {
+    }
+    else if (h2 <= 12)
+    {
       addWordToFrame(w_hours[h2 - 1]);
-    } else {
+    }
+    else
+    {
       addWordToFrame(w_hours[h2 - 13]);
     }
-    if(h2 == 11 || h2 == 23) {
-      addWordToFrame(w_el);
-    }
-  
+
     // Time of day
-    if(h < 6) {
-      addWordToFrame(w_at);
+    if (h < 6)
+    {
+      addWordToFrame(w_in);
+      addWordToFrame(w_the);
       addWordToFrame(w_night);
-    } else if(h < 12) {
+    }
+    else if (h < 12)
+    {
       addWordToFrame(w_in);
       addWordToFrame(w_the);
       addWordToFrame(w_morning);
-    } else if(h < 18) {
+    }
+    else if (h < 18)
+    {
       addWordToFrame(w_in);
       addWordToFrame(w_the);
       addWordToFrame(w_afternoon);
-    } else if(h < 22) {
+    }
+    else if (h < 22)
+    {
       addWordToFrame(w_in);
       addWordToFrame(w_the);
       addWordToFrame(w_evening);
-    } else {
-      addWordToFrame(w_at);
+    }
+    else
+    {
+      addWordToFrame(w_in);
+      addWordToFrame(w_the);
       addWordToFrame(w_night);
     }
-    
-  }
-  
-  // Temperature
-  addWordToFrame(w_and);
-  if(t <= 16) {
-    addWordToFrame(w_cold);
-  } else if (t <= 20) {
-    addWordToFrame(w_cool);
-  } else if (t <= 30) {
-    addWordToFrame(w_warm);
-  } else {
-    addWordToFrame(w_hot);
   }
 
+  //convert m to binary
+  for (byte i = 0; i < 6; i++)
+  {
+    setLed(15, 11 - i, m & 1 << i);
+  }
+
+  //convert h to binary
+  for (byte i = 0; i < 5; i++)
+  {
+    setLed(15, 4 - i, h & 1 << i);
+  }
+
+  //convert s to binary
+  for (byte i = 0; i < 3; i++)
+  {
+    setLed(15, 15 - i, s & 1 << i);
+  }
+
+  // Temperature
+  addWordToFrame(w_and);
+  if (t <= 16)
+  {
+    addWordToFrame(w_cold);
+  }
+  else if (t <= 20)
+  {
+    addWordToFrame(w_cool);
+  }
+  else if (t <= 30)
+  {
+    addWordToFrame(w_warm);
+  }
+  else
+  {
+    addWordToFrame(w_hot);
+  }
 
   /* 
   #pragma region
@@ -497,6 +555,6 @@ void showTimeWords()
     addWordToFrame(w_nit);
   }
   #pragma endregion
-  */ 
+  */
   updateDisplay();
 }

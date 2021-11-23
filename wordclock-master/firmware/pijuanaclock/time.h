@@ -2,19 +2,18 @@
 #define TIME_H
 
 #if ARDUINO >= 100
-  #include "Arduino.h"
+#include "Arduino.h"
 #else
-  #include "WProgram.h"
+#include "WProgram.h"
 #endif
-#include "Chronodot.h"  // Real time clock library    - https://github.com/Stephanie-Maks/Arduino-Chronodot
+#include "Chronodot.h" // Real time clock library    - https://github.com/Stephanie-Maks/Arduino-Chronodot
 
 // The real time clock chip (DS3231)
 extern Chronodot RTC;
 
-#define TIME_MODE_NORMAL         0
-#define TIME_MODE_SETTING_HOUR   1
+#define TIME_MODE_NORMAL 0
+#define TIME_MODE_SETTING_HOUR 1
 #define TIME_MODE_SETTING_MINUTE 2
-
 
 // Clock variables
 extern byte h, m;
@@ -44,65 +43,64 @@ void showTimeWords();
 // Words
 // Format: { line index, start position index, length }
 
-
-const byte w_it[3]         PROGMEM =  { 0,  0,  2 };
-const byte w_is[3]         PROGMEM =  { 0,  3,  2 };
-const byte w_half[3]       PROGMEM =  { 7,  0,  4 }; 
-const byte w_to[3]         PROGMEM =  { 7,  14, 2 };
-const byte w_past[3]       PROGMEM =  { 8,  0,  4 };
-const byte w_oclock[3]     PROGMEM =  { 11, 10, 6 };
-const byte w_in[3]         PROGMEM =  { 12, 0,  2 };
-const byte w_the[3]        PROGMEM =  { 12, 3,  3 };
-const byte w_afternoon[3]  PROGMEM =  { 12, 7,  9 };
-const byte w_noon[3]       PROGMEM =  { 12, 12, 4 }; // part of "afternoon"
-const byte w_midnight[3]   PROGMEM =  { 4,  8,  8 };
-const byte w_morning[3]    PROGMEM =  { 13, 0,  7 };
-const byte w_at[3]         PROGMEM =  { 13, 8,  2 };
-const byte w_night[3]      PROGMEM =  { 13, 11, 5 };
-const byte w_evening[3]    PROGMEM =  { 14, 0,  7 };
-const byte w_and[3]        PROGMEM =  { 14, 8,  3 };
-const byte w_cold[3]       PROGMEM =  { 14, 12, 4 };
-const byte w_cool[3]       PROGMEM =  { 15, 0,  4 };
-const byte w_warm[3]       PROGMEM =  { 15, 6,  4 };
-const byte w_hot[3]        PROGMEM =  { 15, 12, 3 };
-const byte w_el[3]         PROGMEM =  { 9,  2,  2 };
+const byte w_it[3] PROGMEM = {0, 0, 2};
+const byte w_is[3] PROGMEM = {0, 3, 2};
+const byte w_half[3] PROGMEM = {7, 0, 4};
+const byte w_to[3] PROGMEM = {7, 4, 2};
+const byte w_past[3] PROGMEM = {7, 6, 4};
+const byte w_oclock[3] PROGMEM = {11, 1, 6};
+const byte w_in[3] PROGMEM = {11, 8, 2};
+const byte w_the[3] PROGMEM = {11, 11, 3};
+const byte w_afternoon[3] PROGMEM = {12, 0, 9};
+const byte w_noon[3] PROGMEM = {12, 5, 4}; // part of "afternoon"
+const byte w_midnight[3] PROGMEM = {6, 1, 8};
+const byte w_morning[3] PROGMEM = {12, 9, 7};
+// const byte w_at[3]         PROGMEM =  { 13, 8,  2 };
+const byte w_night[3] PROGMEM = {13, 0, 5};
+const byte w_evening[3] PROGMEM = {13, 5, 7};
+const byte w_and[3] PROGMEM = {13, 13, 3};
+const byte w_cold[3] PROGMEM = {14, 12, 4};
+const byte w_cool[3] PROGMEM = {14, 0, 4};
+const byte w_warm[3] PROGMEM = {14, 4, 4};
+const byte w_hot[3] PROGMEM = {14, 8, 3};
+// const byte w_el[3]         PROGMEM =  { 9,  2,  2 };
 
 const byte w_minutes[20][3] PROGMEM = {
-  { 0,  13, 3 }, // one
-  { 1,  0,  3 }, // two
-  { 3,  0,  5 }, // three
-  { 2,  12, 4 }, // four
-  { 2,  0,  4 }, // five
-  { 5,  0,  3 }, // six
-  { 6,  0,  5 }, // seven
-  { 5,  8,  5 }, // eight
-  { 3,  6,  4 }, // nine
-  { 1,  4,  3 }, // ten
-  { 2,  5,  6 }, // eleven
-  { 6,  10, 6 }, // twelve
-  { 1,  8,  8 }, // thirteen
-  { 4,  0,  8 }, // fourteen
-  { 7,  6,  7 }, // quarter
-  { 5,  0,  7 }, // sixteen
-  { 6,  0,  9 }, // seventeen
-  { 5,  8,  8 }, // eighteen
-  { 3,  6,  8 }, // nineteen
-  { 0,  6,  6 }  // twenty
+    {2, 13, 3}, // one
+    {1, 13, 3}, // two
+    {2, 0, 5},  // three
+    {0, 12, 4}, // four
+    {1, 9, 4},  // five
+    {5, 3, 3},  // six
+    {1, 0, 5},  // seven
+    {4, 0, 5},  // eight
+    {4, 8, 4},  // nine
+    {5, 0, 3},  // ten
+    {3, 10, 6}, // eleven
+    {5, 10, 6}, // twelve
+    {2, 5, 8},  // thirteen
+    {3, 3, 8},  // fourteen
+    {6, 9, 7},  // quarter
+    {5, 3, 7},  // sixteen
+    {1, 0, 9},  // seventeen
+    {4, 0, 8},  // eighteen
+    {4, 8, 8},  // nineteen
+    {0, 6, 6}   // twenty
 };
 
 const byte w_hours[12][3] PROGMEM = {
-  { 8,  5,  3 }, // one
-  { 8,  9,  3 }, // two
-  { 11, 4,  5 }, // three
-  { 9,  7,  4 }, // four
-  { 9,  12, 4 }, // five
-  { 8,  13, 3 }, // six
-  { 10, 0,  5 }, // seven
-  { 10, 6,  5 }, // eight
-  { 10, 12, 4 }, // nine
-  { 11, 0,  3 }, // ten
-  { 10, 1,  4 }, // "even"
-  { 9,  0,  6 }  // twelve
+    {10, 0, 3}, // one
+    {10, 3, 3}, // two
+    {8, 0, 5},  // three
+    {8, 5, 4},  // four
+    {8, 9, 4},  // five
+    {8, 13, 3}, // six
+    {9, 0, 5},  // seven
+    {9, 5, 5},  // eight
+    {7, 12, 4}, // nine
+    {10, 7, 3}, // ten
+    {9, 10, 6}, // eleven
+    {10, 10, 6} // twelve
 };
 
 /*
@@ -210,5 +208,3 @@ const byte w_hores[12][3] PROGMEM = {
 #pragma endregion
 */
 #endif
-
-

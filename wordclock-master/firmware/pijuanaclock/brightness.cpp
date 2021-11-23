@@ -40,16 +40,16 @@ void setBrightnessAuto()
   
   // Read ambient light sensor
   int lightReading = analogRead(PIN_LDR); // 0 to 1023
-  Serial.print(F("lightReading="));Serial.println(lightReading);
+  //Serial.print(F("lightReading="));Serial.println(lightReading);
   lightReading += currentHysteresis; // Add the current hysteresis value to the reading (this has the same effect as moving the thresholds)
   
-  Serial.print(F("lightReading+hyster="));Serial.println(lightReading);
+  //Serial.print(F("lightReading+hyster="));Serial.println(lightReading);
   lightReading = constrain(lightReading, LOWER_BOUND, UPPER_BOUND);
-  Serial.print(F("constrained lightReading="));Serial.println(lightReading);
+  //Serial.print(F("constrained lightReading="));Serial.println(lightReading);
   
   // lightReading -> bright mapping
   int bright = map(lightReading, LOWER_BOUND, UPPER_BOUND, 0, 15);
-  Serial.print(F("bright="));Serial.println(bright);
+  //Serial.print(F("bright="));Serial.println(bright);
   
   if (bright != brightness)
   {
@@ -60,5 +60,3 @@ void setBrightnessAuto()
     setBrightness(bright);
   }
 }
-
-
