@@ -1,3 +1,4 @@
 .vscode/
 *.fcstd1
 **/desktop.ini
+build/
