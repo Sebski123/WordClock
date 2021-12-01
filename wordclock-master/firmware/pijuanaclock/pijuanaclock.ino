@@ -52,16 +52,12 @@
 #include <EEPROM.h>
 #include <Wire.h>
 
-
+#include "animation.h"
 #include "brightness.h"
 #include "character.h"
-#include "credits.h"
 #include "display.h"
 #include "life.h"
 #include "serial.h"
-#include "simon.h"
-#include "temphum.h"
-#include "tetris.h"
 #include "time.h"
 #include "timeanalog.h"
 #include "touchbuttons.h"
@@ -81,10 +77,6 @@ void setup() {
   Serial.println(F("Init RTC"));
   initRTC();
 
-  // Initiate the temperature and humidity sensor
-  Serial.println(F("Init temp sensor"));
-  initTempHum();
-
   // Initiate the capacitive touch inputs
   Serial.println(F("Init touch sensor"));
   initTouch();
@@ -95,11 +87,7 @@ void setup() {
   boolean showBoot = EEPROM.read(EEPROM_SHOW_BOOT);
 
   setBrightness(15);
-  
-  // Boot message
-  if (showBoot)
-    showBootMessage();
-  
+
   Serial.println(F("Done. Hello!"));
 
   // Show serial menu
@@ -135,14 +123,8 @@ void stateManager()
   {
     case MODE_WORD_CLOCK:
     case MODE_DIGITAL_CLOCK:
-    case MODE_ANALOG_CLOCK:
 
       timeManager(now, modeChanged);
-      break;
-
-    case MODE_TEMP_HUMIDITY:
-
-      tempHumManager(now, modeChanged);
       break;
 
     case MODE_GAME_OF_LIFE:
@@ -150,21 +132,11 @@ void stateManager()
       gameOfLifeManager(now, modeChanged);
       break;
 
-    case MODE_SIMON:
+    case MODE_ANIMATION:
     
-      simonManager(now, modeChanged);
+      animationManager(now, modeChanged);
       break;
 
-    case MODE_TETRIS:
-      
-      tetrisManager(now, modeChanged);
-      break;
-      
-    case MODE_CREDITS:
-
-      creditsManager(now, modeChanged);
-      break;
-      
     default:
       break;
   }

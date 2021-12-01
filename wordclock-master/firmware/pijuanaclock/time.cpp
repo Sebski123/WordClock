@@ -4,7 +4,6 @@
 #include "touchbuttons.h"
 #include "display.h"
 #include "character.h"
-#include "credits.h"
 
 Chronodot RTC;
 
@@ -179,9 +178,6 @@ void showTime()
     break;
   case MODE_DIGITAL_CLOCK:
     showTimeDigits();
-    break;
-  case MODE_ANALOG_CLOCK:
-    showTimeAnalog();
     break;
   }
 }

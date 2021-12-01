@@ -71,14 +71,10 @@ extern byte keysPressed;
 
 #define MODE_WORD_CLOCK    0
 #define MODE_DIGITAL_CLOCK 1
-#define MODE_TEMP_HUMIDITY 2
-#define MODE_ANALOG_CLOCK  3
-#define MODE_GAME_OF_LIFE  4
-#define MODE_SIMON         5
-#define MODE_TETRIS        6
-#define MODE_CREDITS       7
+#define MODE_GAME_OF_LIFE  2
+#define MODE_ANIMATION     3
 
-#define TOTAL_MODES        8
+#define TOTAL_MODES        4
 extern byte displayMode;
 
 // Go to the next mode
