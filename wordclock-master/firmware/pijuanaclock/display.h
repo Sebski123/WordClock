@@ -3,29 +3,26 @@
 #ifndef DISPLAY_H
 #define DISPLAY_H
 #if ARDUINO >= 100
-  #include "Arduino.h"
+#include "Arduino.h"
 #else
-  #include "WProgram.h"
+#include "WProgram.h"
 #endif
 #include "LedControl.h" // MAX7219 - LED matrix drivers - http://playground.arduino.cc/Main/LedControl
 
 // Pins to led drivers
-#define pinData  14  // A0 (used as digital pin)
-#define pinLoad  15  // A1 (used as digital pin)
-#define pinClock 16  // A2 (used as digital pin)
-
+#define pinData 8   // A0 (used as digital pin)
+#define pinLoad 7   // A1 (used as digital pin)
+#define pinClock 16 // A2 (used as digital pin)
 
 #define SIZE 16
 
 // Buffer
-//extern boolean     frame[SIZE][SIZE];  // Dimensions are [row][column]
-//extern boolean prevframe[SIZE][SIZE];
+// extern boolean     frame[SIZE][SIZE];  // Dimensions are [row][column]
+// extern boolean prevframe[SIZE][SIZE];
 
 // New space-saving buffers
-extern byte     frame2[32];
+extern byte frame2[32];
 extern byte prevFrame2[32];
-
-
 
 #define noBoards 4
 
@@ -44,10 +41,10 @@ void setLed(byte row, byte col, boolean on);
 // Frame functions
 
 // Set a LED in the frame on or off
-void setFrame(byte* frame2, byte row, byte col, boolean on);
+void setFrame(byte *frame2, byte row, byte col, boolean on);
 
 // Get the state of an LED in the frame
-boolean getFrame(byte* frame2, byte row, byte col);
+boolean getFrame(byte *frame2, byte row, byte col);
 
 // Show the frame on the display (only switch changed LEDs)
 // Also copy the frame to the previous frame buffer
@@ -62,7 +59,7 @@ void addWordToFrame(const byte theword[3]);
 /*
 //TODO remove if unnecessary
 // Two smileys stacked vertically
-const byte smileys[32] PROGMEM = 
+const byte smileys[32] PROGMEM =
 {
   B00000000,B00000000,
   B00001100,B00110000,

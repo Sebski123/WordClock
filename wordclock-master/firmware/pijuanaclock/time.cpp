@@ -41,7 +41,7 @@ void timeManager(unsigned long now, boolean modeChanged)
       return;
     }
   }
-  else //timeMode != TIME_MODE_NORMAL (Setting time)
+  else // timeMode != TIME_MODE_NORMAL (Setting time)
   {
     // Exit setting time mode when pressing right bottom button
     if (BR_KEY_DOWN)
@@ -55,13 +55,13 @@ void timeManager(unsigned long now, boolean modeChanged)
   // Proceed only if just entered this mode or if interval has passed or if setting time
   if (!modeChanged && now - prev < TIME_INTERVAL && timeMode == TIME_MODE_NORMAL)
     return;
-  //prev = now; // done below
+  // prev = now; // done below
 
   if (timeMode == TIME_MODE_NORMAL)
   {
     // Get the time from the RTC
     getRTCtime();
-    //DEBUG
+    // DEBUG
     /*m++;
     if (m == 60)
     {
@@ -72,7 +72,7 @@ void timeManager(unsigned long now, boolean modeChanged)
     }
     */
   }
-  else //timeMode != TIME_MODE_NORMAL (Setting time)
+  else // timeMode != TIME_MODE_NORMAL (Setting time)
   {
     if (BL_KEY_DOWN) // Bottom left button pressed
     {
@@ -96,7 +96,7 @@ void timeManager(unsigned long now, boolean modeChanged)
         else
           h--;
       }
-      else //timeMode == TIME_MODE_SETTING_MINUTE
+      else // timeMode == TIME_MODE_SETTING_MINUTE
       {
         if (m == 0)
           m = 59;
@@ -115,7 +115,7 @@ void timeManager(unsigned long now, boolean modeChanged)
         else
           h++;
       }
-      else //timeMode == TIME_MODE_SETTING_MINUTE
+      else // timeMode == TIME_MODE_SETTING_MINUTE
       {
         if (m == 59)
           m = 0;
@@ -139,10 +139,10 @@ void initRTC()
   RTC.begin();
   if (!RTC.isrunning())
   {
-    //Serial.println(F("[WARNING] RTC is NOT running!"));
+    // Serial.println(F("[WARNING] RTC is NOT running!"));
     RTC.adjust(DateTime(__DATE__, __TIME__));
-    //RTC.adjust(DateTime("Sep 12 2015", "17:00:00"));
-    //RTC.adjust(DateTime(0l));
+    // RTC.adjust(DateTime("Sep 12 2015", "17:00:00"));
+    // RTC.adjust(DateTime(0l));
   }
 }
 
@@ -210,8 +210,8 @@ void showTimeDigits()
   }
 
   // Draw blinking colon
-  //frame[2][13] = blink;
-  //frame[4][13] = blink;
+  // frame[2][13] = blink;
+  // frame[4][13] = blink;
   setFrame(frame2, 2, 13, blink);
   setFrame(frame2, 4, 13, blink);
   blink = !blink;
@@ -298,12 +298,15 @@ void showTimeWords()
     {
       addWordToFrame(w_hours[h2 - 13]);
     }
+    if (h2 == 11 || h2 == 23)
+    {
+      addWordToFrame(w_el);
+    }
 
     // Time of day
     if (h < 6)
     {
-      addWordToFrame(w_in);
-      addWordToFrame(w_the);
+      addWordToFrame(w_at);
       addWordToFrame(w_night);
     }
     else if (h < 12)
@@ -326,28 +329,9 @@ void showTimeWords()
     }
     else
     {
-      addWordToFrame(w_in);
-      addWordToFrame(w_the);
+      addWordToFrame(w_at);
       addWordToFrame(w_night);
     }
-  }
-
-  //convert m to binary
-  for (byte i = 0; i < 6; i++)
-  {
-    setLed(15, 11 - i, m & 1 << i);
-  }
-
-  //convert h to binary
-  for (byte i = 0; i < 5; i++)
-  {
-    setLed(15, 4 - i, h & 1 << i);
-  }
-
-  //convert s to binary
-  for (byte i = 0; i < 3; i++)
-  {
-    setLed(15, 15 - i, s & 1 << i);
   }
 
   // Temperature
@@ -369,22 +353,22 @@ void showTimeWords()
     addWordToFrame(w_hot);
   }
 
-  /* 
+  /*
   #pragma region
   // Minuts
   if (m == 0) {
     afegirEsSon(h,m);
     afegirLaLesHores(h);
     addWordToFrame(w_h_en);
-    addWordToFrame(w_h_punt); 
-    
+    addWordToFrame(w_h_punt);
+
   } else { //Minuts són diferents de 0
     if (m < 7) {
       afegirEsSon(h,m);
       afegirLaLesHores(h);
       addWordToFrame(w_i_p_min);
       addWordToFrame(w_minuts_passen[m - 1]);
-      if (m == 1) {  
+      if (m == 1) {
         addWordToFrame(w_p_minut);
       } else {
         addWordToFrame(w_p_minuts);
@@ -394,27 +378,27 @@ void showTimeWords()
       if (m == 7) {
         afegirEsSon(h2,m);
         addWordToFrame(w_mig_q);
-        addWordToFrame(w_quart);   
+        addWordToFrame(w_quart);
         afegirDpelsQuarts(h2);
       } else if (m >= 8 && m <= 14) {   // Falten minuts per un quart
         if (m == 14) {
           addWordToFrame(w_falta);
-          addWordToFrame(w_f_minut); 
+          addWordToFrame(w_f_minut);
         } else {
           addWordToFrame(w_falten);
-          addWordToFrame(w_f_minuts); 
+          addWordToFrame(w_f_minuts);
         }
         addWordToFrame(w_minuts_falten[m-8]);
         addWordToFrame(w_per);
-        addWordToFrame(w_a);    
+        addWordToFrame(w_a);
         addWordToFrame(w_un_q);
         addWordToFrame(w_quart);
-        afegirDpelsQuarts(h2); 
+        afegirDpelsQuarts(h2);
       } else if (m == 15) {              // Un quart
         afegirEsSon(h2,m);
         addWordToFrame(w_un_q);
         addWordToFrame(w_quart);
-        afegirDpelsQuarts(h2);  
+        afegirDpelsQuarts(h2);
       } else if (m >= 16 && m <= 21) {    // Un quart i
         afegirEsSon(h2,m);
         addWordToFrame(w_un_q);
@@ -423,9 +407,9 @@ void showTimeWords()
         addWordToFrame(w_i_p_min);
         addWordToFrame(w_minuts_passen[m-16]);
         if (m == 16) {
-          addWordToFrame(w_p_minut); 
+          addWordToFrame(w_p_minut);
         } else {
-          addWordToFrame(w_p_minuts); 
+          addWordToFrame(w_p_minuts);
         }
       } else if (m == 22) {              // Un quart i mig
         afegirEsSon(h2,m);
@@ -433,25 +417,25 @@ void showTimeWords()
         addWordToFrame(w_quart);
         addWordToFrame(w_im);
         addWordToFrame(w_mig);
-        afegirDpelsQuarts(h2); 
+        afegirDpelsQuarts(h2);
       } else if (m >= 23 && m <= 29) {  // Falten minuts per dos quarts
         if (m == 29) {
           addWordToFrame(w_falta);
-          addWordToFrame(w_f_minut); 
+          addWordToFrame(w_f_minut);
         } else {
           addWordToFrame(w_falten);
-          addWordToFrame(w_f_minuts); 
+          addWordToFrame(w_f_minuts);
         }
         addWordToFrame(w_minuts_falten[m-23]);
         addWordToFrame(w_per);
-        addWordToFrame(w_a);  
+        addWordToFrame(w_a);
         addWordToFrame(w_dos_q);
-        addWordToFrame(w_quarts); 
-        afegirDpelsQuarts(h2); 
+        addWordToFrame(w_quarts);
+        afegirDpelsQuarts(h2);
       } else if (m == 30) {              // Dos quarts
         afegirEsSon(h2,m);
         addWordToFrame(w_dos_q);
-        addWordToFrame(w_quarts); 
+        addWordToFrame(w_quarts);
         afegirDpelsQuarts(h2);
       } else if (m >= 31 && m <= 36) {   // Dos quarts i
         afegirEsSon(h2,m);
@@ -461,9 +445,9 @@ void showTimeWords()
         addWordToFrame(w_i_p_min);
         addWordToFrame(w_minuts_passen[m-31]);
         if (m == 31) {
-          addWordToFrame(w_p_minut); 
+          addWordToFrame(w_p_minut);
         } else {
-          addWordToFrame(w_p_minuts); 
+          addWordToFrame(w_p_minuts);
         }
       } else if (m == 37) {
         afegirEsSon(h2,m);
@@ -475,17 +459,17 @@ void showTimeWords()
       } else if (m >= 38 && m <= 44) { // Falten minuts per tres quarts
         if (m == 44) {
           addWordToFrame(w_falta);
-          addWordToFrame(w_f_minut); 
+          addWordToFrame(w_f_minut);
         } else {
           addWordToFrame(w_falten);
-          addWordToFrame(w_f_minuts); 
+          addWordToFrame(w_f_minuts);
         }
         addWordToFrame(w_minuts_falten[m-38]);
         addWordToFrame(w_per);
-        addWordToFrame(w_a); 
+        addWordToFrame(w_a);
         addWordToFrame(w_tres_q);
         addWordToFrame(w_quarts);
-        afegirDpelsQuarts(h2);  
+        afegirDpelsQuarts(h2);
       } else if (m == 45) {            // Tres quarts
         afegirEsSon(h2,m);
         addWordToFrame(w_tres_q);
@@ -499,9 +483,9 @@ void showTimeWords()
         addWordToFrame(w_i_p_min);
         addWordToFrame(w_minuts_passen[m-46]);
         if (m == 46) {
-          addWordToFrame(w_p_minut); 
+          addWordToFrame(w_p_minut);
         } else {
-          addWordToFrame(w_p_minuts); 
+          addWordToFrame(w_p_minuts);
         }
       } else if (m == 52) {
         afegirEsSon(h2,m);
@@ -513,19 +497,19 @@ void showTimeWords()
       } else if (m >= 53 && m <= 59) {
         if (m == 59) {
           addWordToFrame(w_falta);
-          addWordToFrame(w_f_minut); 
+          addWordToFrame(w_f_minut);
         } else {
           addWordToFrame(w_falten);
-          addWordToFrame(w_f_minuts); 
+          addWordToFrame(w_f_minuts);
         }
         addWordToFrame(w_minuts_falten[m-53]);
         addWordToFrame(w_per);
-        addWordToFrame(w_a); 
+        addWordToFrame(w_a);
         afegirLaLesHores(h2);
       }
     }
-  } 
-  
+  }
+
   // Hores
   if (h2 == 0) {
     addWordToFrame(w_hores[11]);
@@ -543,7 +527,7 @@ void showTimeWords()
     addWordToFrame(w_migdia);
   } else if (h >= 15 && h < 21) {
     addWordToFrame(w_boot_de);
-    addWordToFrame(w_boot_la); 
+    addWordToFrame(w_boot_la);
     addWordToFrame(w_tarda);
   } else {
     addWordToFrame(w_boot_de);
