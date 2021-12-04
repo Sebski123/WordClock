@@ -15,10 +15,11 @@ byte animation = 0;
 byte speed = 0;
 byte mod = 1;
 byte frame = 0;
-byte dir = 1; //up 0, right 1, down 2, left 3
+byte dir = 1; // up 0, right 1, down 2, left 3
 byte snake[7] = {0, 0, 0, 0, 0, 0, 0};
 byte dirArr[4] = {0, 1, 2, 3};
-boolean isSnaekDead;
+byte textBuffer[10];
+state currentState = state::OBTAIN_CHAR;
 
 unsigned long previousTime;
 
@@ -40,10 +41,10 @@ void animationManager(unsigned long now, boolean modeChanged)
 
   if (BL_KEY_DOWN) // Change animation
   {
-    animation = (animation + 1) % 4;
+    animation = (animation + 1) % 5;
     setupAnimation();
   }
-  if (BR_KEY_DOWN) //Change speed
+  if (BR_KEY_DOWN) // Change speed
   {
     if (speed == 0)
     {
@@ -65,139 +66,164 @@ void setupAnimation()
   currentPos = 0;
   ledState = false;
   previousTime = millis();
-  isSnaekDead = false;
   dir = 1;
-  memset(snake,0,sizeof(snake));
+  memset(snake, 0, sizeof(snake));
 }
 
 void iterateAnimation()
 {
-  switch (animation)
+  if (millis() - previousTime > speed)
   {
-  case 0:
-    animation1();
-    break;
-  case 1:
-    animation2();
-    break;
-  case 2:
-    animation3();
-    break;
-  case 3:
-    animation4();
-    break;
+    previousTime = millis();
+
+    switch (animation)
+    {
+    case 0:
+      animation1();
+      break;
+    case 1:
+      animation2();
+      break;
+    case 2:
+      animation3();
+      break;
+    case 3:
+      animation4();
+      break;
+    case 4:
+      animation5();
+      break;
+    }
+    updateDisplay();
   }
 }
 
-void animation1() //Printer fill
+void animation1() // Printer fill
 {
-  if (millis() - previousTime > speed)
+  if (currentPos == 0)
   {
-    previousTime = millis();
-    if (currentPos == 0)
+    ledState = !ledState;
+  }
+  setLed(currentPos / 16, currentPos % 16, ledState);
+  currentPos++;
+}
+void animation2() // Diagonal printer fill
+{
+  if (currentPos == 0)
+  {
+    mod = (mod + 1) % 7;
+    if (mod == 0)
     {
-      ledState = !ledState;
+      mod = 2;
     }
-    setLed(currentPos / 16, currentPos % 16, ledState);
-    currentPos++;
+    setAllLeds(false);
+  }
+  if ((currentPos / 16 + currentPos % 16) % mod == 0)
+  {
+    setLed(currentPos / 16, currentPos % 16, true);
+  }
+  currentPos++;
+}
+void animation3() // Square fill
+{
+  if (currentPos == 0)
+  {
+    ledState = !ledState;
+  }
+
+  setLed(currentPos / 16, currentPos % 16, ledState);
+
+  if (currentPos == 135)
+  {
+    dir = 5;
+  }
+  else if (currentPos == 0)
+  {
+    dir = 1;
+  }
+  else if ((currentPos - 16) / 16 == currentPos % 16 && (currentPos / 16) + (currentPos % 16) < 15)
+  {
+    dir = 1;
+  }
+  else if (currentPos / 16 + currentPos % 16 == 15 && (currentPos / 16) < 8)
+  {
+    dir = 2;
+  }
+  else if (currentPos / 16 == currentPos % 16 && (currentPos / 16) + (currentPos % 16) > 15)
+  {
+    dir = 3;
+  }
+  else if (currentPos / 16 + currentPos % 16 == 15 && (currentPos / 16) > 7)
+  {
+    dir = 0;
+  }
+  else if (currentPos == 136)
+  {
+    dir = 5;
+  }
+  currentPos = moveCurrentPosDir(dir);
+}
+void animation4() // snaek
+{
+  byte tempPos;
+  shuffleArr(dirArr);
+
+  for (size_t i = 0; i < 4; i++)
+  {
+    tempPos = moveCurrentPosDir(dirArr[i]);
+    if (isPosInSnake(tempPos))
+    {
+      continue;
+    }
+    shiftSnakeArr(tempPos);
+    currentPos = tempPos;
+    drawSnake();
+    return;
   }
 }
-void animation2() //Diagonal printer fill
+
+void animation5() // Scrolling text
 {
-  if (millis() - previousTime > speed)
+  static int char_idx = 0;
+  static byte col_idx = 0;
+  char current_char;
+  // State machine
+  switch (currentState)
   {
-    previousTime = millis();
-    if (currentPos == 0)
+  case state::OBTAIN_CHAR:
+    do
     {
-      mod = (mod + 1) % 7;
-      if (mod == 0)
+      // current_char = text[char_idx];
+      current_char = pgm_read_byte_near(text + char_idx);
+      if (current_char == '\0')
       {
-        mod = 2;
+        char_idx = -1;
+        current_char = ' ';
       }
-      setAllLeds(false);
-    }
-    if ((currentPos / 16 + currentPos % 16) % mod == 0)
-    {
-      setLed(currentPos / 16, currentPos % 16, true);
-    }
-    currentPos++;
-  }
-}
-void animation3() //Square fill
-{
+      // Serial.println(current_char);
+    } while (current_char < 32 || current_char > 126);
+    current_char -= 32;
+    memcpy_P(textBuffer, CH + 7 * current_char, 7);
+    currentState = state::SHIFT_N_PRINT_CHAR;
 
-  if (millis() - previousTime > speed)
-  {
-    previousTime = millis();
-
-    if (currentPos == 0)
+  case state::SHIFT_N_PRINT_CHAR:
+    if (col_idx < textBuffer[0])
     {
-      Serial.println("flip");
-      ledState = !ledState;
-    }
-
-    setLed(currentPos / 16, currentPos % 16, ledState);
-
-    if (currentPos == 135)
-    {
-      dir = 5;
-    }
-    else if (currentPos == 0)
-    {
-      dir = 1;
-    }
-    else if ((currentPos - 16) / 16 == currentPos % 16 && (currentPos / 16) + (currentPos % 16) < 15)
-    {
-      dir = 1;
-    }
-    else if (currentPos / 16 + currentPos % 16 == 15 && (currentPos / 16) < 8)
-    {
-      dir = 2;
-    }
-    else if (currentPos / 16 == currentPos % 16 && (currentPos / 16) + (currentPos % 16) > 15)
-    {
-      dir = 3;
-    }
-    else if (currentPos / 16 + currentPos % 16 == 15 && (currentPos / 16) > 7)
-    {
-      dir = 0;
-    }
-    else if (currentPos == 136)
-    {
-      dir = 5;
-    }
-    currentPos = moveCurrentPosDir(dir);
-  }
-}
-void animation4() //snaek
-{
-  if (millis() - previousTime > speed)
-  {
-    if (!isSnaekDead)
-    {
-      byte tempPos;
-      previousTime = millis();
-      shuffleArr(dirArr);
-
-      for (size_t i = 0; i < 4; i++)
+      shiftLeft();
+      for (byte i = 0; i < 8; i++)
       {
-        tempPos = moveCurrentPosDir(dirArr[i]);
-        if (isPosInSnake(tempPos))
-        {
-          continue;
-        }
-        shiftSnakeArr(tempPos);
-        currentPos = tempPos;
-        drawSnake();
-        return;
+        setFrame(frame2, i, SIZE - 1, textBuffer[col_idx + 2] & (1 << (i)));
       }
-      Serial.println("HElloooo");
-      isSnaekDead = true;
+      col_idx++;
     }
-    else if(millis()-previousTime > 2000);
+    else
     {
-      setupAnimation();
+      shiftLeft();
+      col_idx = 0;
+      char_idx++;
+      currentState = state::OBTAIN_CHAR;
     }
+    break;
   }
 }
 
@@ -210,7 +236,6 @@ void shuffleArr(byte arr[])
     arr[n] = arr[i];
     arr[i] = temp;
   }
-  
 }
 
 byte moveCurrentPosDir(byte dir)
@@ -218,19 +243,19 @@ byte moveCurrentPosDir(byte dir)
   byte tempPos = currentPos;
   switch (dir)
   {
-  case 0: //up
+  case 0: // up
     tempPos = tempPos - 16;
     break;
 
-  case 1: //right
+  case 1: // right
     tempPos++;
     break;
 
-  case 2: //down
+  case 2: // down
     tempPos = tempPos + 16;
     break;
 
-  case 3: //left
+  case 3: // left
     tempPos--;
     break;
 
@@ -270,7 +295,19 @@ void shiftSnakeArr(byte newPos)
   setLed(snake[6] / 16, snake[6] % 16, false);
   for (size_t i = 6; i > 0; i--)
   {
-    snake[i] = snake[i-1];
+    snake[i] = snake[i - 1];
   }
   snake[0] = newPos;
+}
+
+void shiftLeft()
+{
+  bool temp = false;
+  for (int i = 0; i < sizeof(frame2) / sizeof(frame2[0]); i += 2)
+  {
+    temp = (frame2[i + 1] >> 7) & 1;
+    frame2[i + 1] <<= 1;
+    frame2[i] <<= 1;
+    frame2[i] = ((frame2[i] >> 0) << 1) | temp;
+  }
 }
